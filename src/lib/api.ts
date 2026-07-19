@@ -14,7 +14,7 @@ export type Priority = 'High' | 'Medium' | 'Low';
 export type ProjectTask = { title: string; status: 'todo' | 'in-progress' | 'done' | string; priority: Priority | string; sprint: number };
 export type Project = { id: string; title: string; shortDescription: string; fullDescription?: string; deadline?: string; priority: Priority; techStack: string[]; createdAt: string; imageUrl?: string; aiBlueprint?: string; tasks?: ProjectTask[]; owner?: string };
 export type ProjectsResponse = { data: Project[]; total: number; page: number; pages: number };
-export type SessionUser = { name: string; email: string };
+export type SessionUser = { id?: string; name: string; email: string; avatarUrl?: string };
 export const token = () => typeof window === 'undefined' ? null : localStorage.getItem('devsprint_token');
 export function subscribeSession(onChange: () => void) {
   if (typeof window === 'undefined') return () => {};

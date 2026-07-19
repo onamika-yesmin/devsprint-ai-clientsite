@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useSyncExternalStore } from "react";
 import { clearSession, currentUser, serverSessionSnapshot, sessionSnapshot, subscribeSession } from "../../lib/api";
+import { initials } from "../../lib/images";
 
 export function NavBar() {
   const router = useRouter();
@@ -34,7 +35,10 @@ export function NavBar() {
     </nav>
     <div className="nav-actions">
       {signedIn ? <>
-        <Link href="/profile">{user?.name?.split(" ")[0] ?? "Profile"}</Link>
+        <Link className="nav-profile" href="/profile">
+          <span className="nav-avatar">{user?.avatarUrl ? <img src={user.avatarUrl} alt="" /> : initials(user?.name)}</span>
+          <span>{user?.name?.split(" ")[0] ?? "Profile"}</span>
+        </Link>
         <button className="nav-button" onClick={logout}>Sign out</button>
       </> : <>
         <Link href="/login">Sign in</Link>
