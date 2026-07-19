@@ -6,6 +6,13 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recha
 import { api, currentUser, Project } from "../../lib/api";
 import { ProtectedPage } from "../components/ProtectedPage";
 
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
 export default function Dashboard() {
   const projectsQuery = useQuery({ queryKey: ["my-projects"], queryFn: () => api<{ data: Project[] }>("/projects/mine") });
   const projects = projectsQuery.data?.data ?? [];
@@ -13,7 +20,7 @@ export default function Dashboard() {
   const done = tasks.filter((task) => task.status === "done").length;
   const open = tasks.filter((task) => task.status !== "done").length;
   const health = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
-  const chartData = projects.slice(0, 6).map((project) => {
+  const chartData = projects.slice(0, 5).map((project) => {
     const projectTasks = project.tasks ?? [];
     return {
       name: project.title.split(" ")[0],
@@ -22,9 +29,10 @@ export default function Dashboard() {
     };
   });
   const user = currentUser();
+  const greeting = getGreeting();
 
   return <ProtectedPage><main className="page-shell">
-    <div className="page-heading"><div className="eyebrow">Your workspace</div><h1>Good morning, {user?.name?.split(" ")[0] ?? "Builder"}.</h1><p>Here is where your projects, AI blueprints, and sprint signals come together.</p></div>
+    <div className="page-heading"><div className="eyebrow">Your workspace</div><h1>{greeting}, {user?.name?.split(" ")[0] ?? "Builder"}.</h1><p>Here is where your projects, AI blueprints, and sprint signals come together.</p></div>
     <div className="dash-actions"><Link className="button ghost" href="/ai">Open AI Studio</Link><Link className="button primary" href="/items/add">+ New project</Link></div>
     <div className="dash-stats">
       <article><small>ACTIVE PROJECTS</small><b>{projects.length.toString().padStart(2, "0")}</b><span>{projects.filter((project) => project.priority === "High").length} high priority</span></article>
@@ -38,11 +46,15 @@ export default function Dashboard() {
     </section>
     <section className="dashboard-section">
       <h2>Active projects</h2>
-      <div className="project-list">{projects.slice(0, 4).map((project) => {
-        const projectTasks = project.tasks ?? [];
-        const progress = projectTasks.length ? Math.round((projectTasks.filter((task) => task.status === "done").length / projectTasks.length) * 100) : 0;
-        return <article key={project.id}><b>{project.title}</b><span>{progress}% complete · {project.shortDescription}</span><i><em style={{ width: `${progress}%` }} /></i><Link href={`/projects/${project.id}`}>Open</Link></article>;
-      })}</div>
+      <div className="project-list">{
+        projects.length > 0 ?
+          projects.slice(0, 5).map((project) => {
+            const projectTasks = project.tasks ?? [];
+            const progress = projectTasks.length ? Math.round((projectTasks.filter((task) => task.status === "done").length / projectTasks.length) * 100) : 0;
+            return <article key={project.id}><b>{project.title}</b><span>{progress}% complete · {project.shortDescription}</span><i><em style={{ width: `${progress}%` }} /></i><Link href={`/projects/${project.id}`}>Open</Link></article>;
+          }) :
+          <div className="empty-state">No active projects yet.</div>
+      }</div>
     </section>
   </main></ProtectedPage>;
 }

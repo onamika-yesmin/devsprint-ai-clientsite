@@ -34,7 +34,7 @@ export function NavBar() {
     </nav>
     <div className="nav-actions">
       {signedIn ? <>
-        <Link href="/dashboard">{user?.name?.split(" ")[0] ?? "Workspace"}</Link>
+        <Link href="/profile">{user?.name?.split(" ")[0] ?? "Profile"}</Link>
         <button className="nav-button" onClick={logout}>Sign out</button>
       </> : <>
         <Link href="/login">Sign in</Link>
