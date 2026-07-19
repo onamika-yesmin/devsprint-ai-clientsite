@@ -27,6 +27,12 @@ export default function ProjectDetails() {
   const total = project.tasks?.length ?? 0;
   const confidence = total ? Math.round((done / total) * 100) : 76;
   const related = relatedQuery.data?.data.filter((item) => item.id !== project.id).slice(0, 3) ?? [];
+  const reviewScore = Math.max(3.8, Math.min(5, 3.9 + confidence / 100)).toFixed(1);
+  const reviews = [
+    { title: "Delivery clarity", text: `${project.title} has a ${confidence}% delivery confidence score based on completed sprint work.` },
+    { title: "Scope quality", text: total ? `${total} planned tasks give this blueprint a clear execution path.` : "The blueprint is ready for task planning." },
+    { title: "Priority fit", text: `${project.priority} priority work is flagged early so the team can plan capacity before sprint start.` },
+  ];
   const statuses = [
     { key: "todo", label: "Todo" },
     { key: "in-progress", label: "In progress" },
@@ -68,6 +74,13 @@ export default function ProjectDetails() {
         <article><b>Tech stack</b><span>{project.techStack?.join(" / ") || "Product strategy"}</span></article>
         <article><b>Deadline</b><span>{deadline}</span></article>
         <article><b>Rating</b><span>{confidence >= 70 ? "Strong delivery fit" : "Needs scope refinement"}</span></article>
+      </div>
+    </section>
+
+    <section className="detail-section reviews-section">
+      <div className="section-line"><h2>Reviews</h2><span>{reviewScore} rating</span></div>
+      <div className="reviews-grid">
+        {reviews.map((review) => <article key={review.title}><b>{review.title}</b><p>{review.text}</p></article>)}
       </div>
     </section>
 

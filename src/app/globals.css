@@ -46,7 +46,7 @@
 }
 
 .auth-form .form-error {
-  color: #dc2626;
+  color: var(--violet);
   font-size: 12px;
   line-height: 1.5;
   text-align: center;
