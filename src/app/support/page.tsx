@@ -18,7 +18,7 @@ export default function Support() {
 
     <form className="support-form" onSubmit={(event) => { event.preventDefault(); setSent(true); }}>
       {sent ? <div className="success">Thanks, your note is on its way. We will reply soon.</div> : <>
-        <label>Name<input required placeholder="Your name" /></label>
+        <label>Name <input required placeholder="Your name" /></label>
         <label>Email<input type="email" required placeholder="you@company.com" /></label>
         <label className="full">How can we help?<textarea required placeholder="Tell us a little about what you need..." /></label>
         <button className="button primary">Send message</button>
