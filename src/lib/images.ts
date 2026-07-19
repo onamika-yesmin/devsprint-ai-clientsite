@@ -1,6 +1,6 @@
-export function fileToDataUrl(file: File, maxBytes = 1_500_000): Promise<string> {
+export function fileToDataUrl(file: File, maxBytes = 20_000_000): Promise<string> {
   if (!file.type.startsWith("image/")) return Promise.reject(new Error("Please choose an image file."));
-  if (file.size > maxBytes) return Promise.reject(new Error("Image must be under 1.5MB."));
+  if (file.size > maxBytes) return Promise.reject(new Error("Image must be under 20MB."));
 
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
