@@ -1,3 +1,51 @@
 "use client";
-import {useState} from "react"; import {api} from "../../../lib/api"; import {useRouter} from "next/navigation";
-export default function AddProject(){const [done,setDone]=useState(false);const [error,setError]=useState('');const router=useRouter();async function submit(e:React.FormEvent<HTMLFormElement>){e.preventDefault();const form=new FormData(e.currentTarget);try{setError('');const response=await api<{data:{id:string}}>('/projects',{method:'POST',body:JSON.stringify({title:form.get('title'),shortDescription:form.get('shortDescription'),fullDescription:form.get('fullDescription'),deadline:form.get('deadline'),priority:form.get('priority'),prdText:form.get('prdText')})});setDone(true);setTimeout(()=>router.push(`/projects/${response.data.id}`),700)}catch(e){setError(e instanceof Error?e.message:'Could not create project')}}return <main className="page-shell form-page"><div className="page-heading"><div className="eyebrow">New project</div><h1>Give your idea a running start.</h1><p>Add a few details and DevSprint will shape your first delivery plan.</p></div>{done?<div className="success">Your project is ready. Opening its AI blueprint…</div>:<form onSubmit={submit}><label>Project title<input name="title" required placeholder="e.g. Customer feedback hub"/></label><label>Short description<input name="shortDescription" required placeholder="One sentence about the opportunity"/></label><label>Full description<textarea name="fullDescription" required placeholder="What are you trying to achieve? Who is it for?"/></label><div className="form-row"><label>Deadline<input name="deadline" type="date"/></label><label>Priority<select name="priority"><option>Medium</option><option>High</option><option>Low</option></select></label></div><label>Cover image<input type="file" accept="image/*"/></label><label>PRD or product brief<textarea name="prdText" placeholder="Paste PRD text here. File parsing can be connected after adding storage/parser credentials."/></label>{error&&<p className="form-error">{error}</p>}<button className="button primary">Generate project blueprint →</button></form>}</main>}
+
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { api } from "../../../lib/api";
+import { ProtectedPage } from "../../components/ProtectedPage";
+
+type CreatedProject = { data: { id: string } };
+
+export default function AddProject() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: (payload: Record<string, unknown>) => api<CreatedProject>("/projects", { method: "POST", body: JSON.stringify(payload) }),
+    onSuccess: async (response) => {
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+      await queryClient.invalidateQueries({ queryKey: ["my-projects"] });
+      router.push(`/projects/${response.data.id}`);
+    },
+  });
+
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    mutation.mutate({
+      title: form.get("title"),
+      shortDescription: form.get("shortDescription"),
+      fullDescription: form.get("fullDescription"),
+      deadline: form.get("deadline"),
+      priority: form.get("priority"),
+      imageUrl: form.get("imageUrl"),
+      techStack: String(form.get("techStack") ?? "").split(",").map((item) => item.trim()).filter(Boolean),
+      prdText: form.get("prdText"),
+    });
+  }
+
+  return <ProtectedPage><main className="page-shell form-page">
+    <div className="page-heading"><div className="eyebrow">New project</div><h1>Give your idea a running start.</h1><p>Add a few details and DevSprint will shape your first delivery plan with AI-generated tasks.</p></div>
+    <form onSubmit={submit}>
+      <label>Project title<input name="title" required placeholder="Customer feedback hub" /></label>
+      <label>Short description<input name="shortDescription" required placeholder="A workspace that turns feedback into product decisions" /></label>
+      <label>Full description<textarea name="fullDescription" required placeholder="Who is it for, what problem does it solve, and what outcome should the first release create?" /></label>
+      <div className="form-row"><label>Deadline<input name="deadline" type="date" /></label><label>Priority<select name="priority"><option>Medium</option><option>High</option><option>Low</option></select></label></div>
+      <label>Tech stack<input name="techStack" placeholder="Next.js, Express, MongoDB" /></label>
+      <label>Optional image URL<input name="imageUrl" type="url" placeholder="https://images.unsplash.com/..." /></label>
+      <label>PRD or product brief<textarea name="prdText" placeholder="Paste requirements, user stories, risks, or acceptance criteria." /></label>
+      {mutation.error ? <p className="form-error">{mutation.error.message}</p> : null}
+      <button className="button primary" disabled={mutation.isPending}>{mutation.isPending ? "Generating blueprint..." : "Generate project blueprint →"}</button>
+    </form>
+  </main></ProtectedPage>;
+}
