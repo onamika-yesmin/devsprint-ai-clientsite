@@ -1,0 +1,5 @@
+const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000/api';
+export type Project = { id: string; title: string; shortDescription: string; fullDescription?: string; priority: 'High' | 'Medium' | 'Low'; techStack: string[]; createdAt: string; imageUrl?: string; aiBlueprint?: string; tasks?: { title: string; status: string; priority: string; sprint: number }[] };
+export const token = () => typeof window === 'undefined' ? null : localStorage.getItem('devsprint_token');
+export async function api<T>(path: string, options: RequestInit = {}): Promise<T> { const response = await fetch(`${baseUrl}${path}`, { ...options, headers: { 'Content-Type': 'application/json', ...(token() ? { Authorization: `Bearer ${token()}` } : {}), ...options.headers } }); const body = response.status === 204 ? null : await response.json(); if (!response.ok) throw new Error(body?.message ?? 'Something went wrong.'); return body as T; }
+export function saveSession(data: { token: string; user: { name: string; email: string } }) { localStorage.setItem('devsprint_token', data.token); localStorage.setItem('devsprint_user', JSON.stringify(data.user)); }
