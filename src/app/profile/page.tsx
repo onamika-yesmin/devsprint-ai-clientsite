@@ -1,10 +1,23 @@
 "use client";
 
-import { currentUser } from "../../lib/api";
+import { useState } from "react";
+import { currentUser, saveSession, SessionUser } from "../../lib/api";
 import { ProtectedPage } from "../components/ProtectedPage";
 
 export default function Profile() {
   const user = currentUser();
+  const [name, setName] = useState(user?.name ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
+  const [success, setSuccess] = useState(false);
+
+  const saveProfile = () => {
+    if (user) {
+      const updatedUser: SessionUser = { ...user, name, email };
+      saveSession({ token: localStorage.getItem("devsprint_token")!, user: updatedUser });
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    }
+  };
 
   return (
     <ProtectedPage>
@@ -14,10 +27,19 @@ export default function Profile() {
           <h1>{user?.name}</h1>
           <p>{user?.email}</p>
         </div>
-        <div className="dash-stats">
-            <article><small>Total Projects</small><b>0</b></article>
-            <article><small>Total Tasks</small><b>0</b></article>
-            <article><small>Completed Tasks</small><b>0</b></article>
+        <div className="form-page" style={{ marginTop: '2rem' }}>
+          <form onSubmit={(e) => { e.preventDefault(); saveProfile(); }}>
+            <label>
+              Full Name
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+            </label>
+            <label>
+              Email Address
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </label>
+            <button className="button primary">Save changes</button>
+            {success && <p style={{ color: 'var(--green)' }}>Profile updated successfully!</p>}
+          </form>
         </div>
       </main>
     </ProtectedPage>

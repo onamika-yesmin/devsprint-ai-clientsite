@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body><Providers><NavBar />{children}<footer>
+  return <html lang="en"><body><Providers><NavBar />{children}<footer className="footer">
     <div className="brand"><span>◆</span> DevSprint <i>AI</i></div>
     <p>Turn product thinking into confident delivery.<br />hello@devsprint.ai</p>
     <div>
