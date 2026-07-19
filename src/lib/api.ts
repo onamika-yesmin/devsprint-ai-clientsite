@@ -1,4 +1,7 @@
-export const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000/api';
+const configuredOrigin = process.env.NEXT_PUBLIC_API_BASE_URL?.replace(/\/$/, '');
+// NEXT_PUBLIC_API_URL takes priority. The origin variant is accepted as well.
+// A missing local env can never send Google sign-in to localhost:5000.
+export const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? (configuredOrigin ? `${configuredOrigin}/api` : 'https://devsprint-ai-serversite.vercel.app/api');
 export type Project = { id: string; title: string; shortDescription: string; fullDescription?: string; priority: 'High' | 'Medium' | 'Low'; techStack: string[]; createdAt: string; imageUrl?: string; aiBlueprint?: string; tasks?: { title: string; status: string; priority: string; sprint: number }[] };
 export const token = () => typeof window === 'undefined' ? null : localStorage.getItem('devsprint_token');
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> { const response = await fetch(`${apiBaseUrl}${path}`, { ...options, headers: { 'Content-Type': 'application/json', ...(token() ? { Authorization: `Bearer ${token()}` } : {}), ...options.headers } }); const body = response.status === 204 ? null : await response.json(); if (!response.ok) throw new Error(body?.message ?? 'Something went wrong.'); return body as T; }
