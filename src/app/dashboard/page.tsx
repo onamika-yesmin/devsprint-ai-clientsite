@@ -51,7 +51,7 @@ export default function Dashboard() {
           projects.slice(0, 5).map((project) => {
             const projectTasks = project.tasks ?? [];
             const progress = projectTasks.length ? Math.round((projectTasks.filter((task) => task.status === "done").length / projectTasks.length) * 100) : 0;
-            return <article key={project.id}><b>{project.title}</b><span>{progress}% complete · {project.shortDescription}</span><i><em style={{ width: `${progress}%` }} /></i><Link href={`/projects/${project.id}`}>Open</Link></article>;
+            return <article key={project.id}><b>{project.title}</b><span>{progress}% complete - {project.shortDescription}</span><i><em style={{ width: `${progress}%` }} /></i><Link href={`/projects/${project.id}`}>Open</Link></article>;
           }) :
           <div className="empty-state">No active projects yet.</div>
       }</div>

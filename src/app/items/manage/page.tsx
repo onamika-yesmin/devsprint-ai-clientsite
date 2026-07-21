@@ -34,6 +34,6 @@ export default function Manage() {
       <button onClick={() => setRemove(project)}>Delete</button>
     </div>)}</div> : null}
     {projectsQuery.error ? <p className="form-error">{projectsQuery.error.message}</p> : null}
-    {remove ? <div className="modal-backdrop"><div className="modal"><h2>Delete {remove.title}?</h2><p>This removes it from your workspace and from the public project library.</p>{deleteMutation.error ? <p className="form-error">{deleteMutation.error.message}</p> : null}<div><button className="button ghost" onClick={() => setRemove(null)}>Cancel</button><button className="button danger" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate(remove.id)}>{deleteMutation.isPending ? "Deleting..." : "Delete project"}</button></div></div></div> : null}
+    {remove ? <div className="modal-backdrop"><div className="modal"><h2>Delete {remove.title}?</h2><p>This removes it from your workspace and from the public project library.</p>{deleteMutation.error ? <p className="form-error">{deleteMutation.error.message}</p> : null}<div className="modal-actions"><button className="button ghost" onClick={() => setRemove(null)}>Cancel</button><button className="button danger" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate(remove.id)}>{deleteMutation.isPending ? "Deleting..." : "Delete project"}</button></div></div></div> : null}
   </main></ProtectedPage>;
 }
